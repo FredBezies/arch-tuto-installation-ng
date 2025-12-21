@@ -27,11 +27,17 @@ Merci à Ewolnux, Xarkam, Frédéric Sierra, Ludovic Riand, Vincent Manillier, T
 I) Installons notre base
 ------------------------
 
-Installer une Archlinux, c’est comme construire une maison. On commence par les fondations, et on rajoute les murs et le reste par la suite. L’image ISO utilisée est la archlinux-2024.08.01-x86\_64.iso, mise en ligne début août 2024.
+Installer une Archlinux, c’est comme construire une maison. On commence par les fondations, et on rajoute les murs et le reste par la suite. L’image ISO utilisée est la archlinux-2025.12.01-x86_64.iso, mise en ligne début décembre 2025.
 
 La machine virtuelle est une machine virtuelle à laquelle j’ai rajouté un disque virtuel de 50 Go. Des points spécifiques concernant l’utilisation dans VirtualBox et VMWare sont indiqués.
 
-**Note :** Désormais, par souci de clarté, seule l'installation en UEFI sera traitée dans cette nouvelle version du tutoriel. Si vous installez Arch Linux dans une machine virtuelle, pensez donc bien à l'activer dans ses paramètres. Si vous ne disposez cependant pas d'UEFI, je vous invite à lire les instructions de paritionnements et d'installation du chargeur d'amorçarge dans [l'annexe dédiée.](annexe-bios.md)
+**Note :** Désormais, par souci de clarté, seule l'installation en UEFI sera traitée dans cette nouvelle version du tutoriel. Si vous installez Arch Linux dans une machine virtuelle, pensez donc bien à l'activer dans ses paramètres. Si vous ne disposez cependant pas d'UEFI, je vous invite à lire les instructions de partitionnements et d'installation du chargeur d'amorçage dans [l'annexe dédiée.](annexe-bios.md)
+
+Voici donc l’écran qui nous permet de démarrer en mode UEFI :
+
+![Démarrage en mode UEFI](pictures/bootscreen.png)
+
+*Démarrage en mode UEFI*
 
 La première chose à faire, c’est d’avoir le clavier français :
 
@@ -45,25 +51,22 @@ ping -c 5 archlinux.org
 ```
 **Note :** si vous souhaitez utiliser une connexion WiFi, un serveur proxy ou SSH pour réaliser l'installation, je vous invite à lire [l'annexe didée à la configuration du réseau](annexe-reseau.md).
 
-Si tout est fonctionnel, nous pouvons passer au partitionnement. Voici donc l’écran qui nous permet de démarrer en mode UEFI :
-
-![Démarrage en mode UEFI](pictures/bootscreen.png)
-
-*Démarrage en mode UEFI*
+Si tout est fonctionnel, nous pouvons passer au partitionnement. Pour plus de sécurité, je vous propose désormais une installation chiffrée avec **LUKS**.
 
 Pour le partitionnement, si vous avez peur de faire des bêtises, il est plus prudent de passer par un LiveCD comme gParted disponible à l’adresse suivante : <http://gparted.org/download.php>
 
 Il faut se souvenir qu’il faut **obligatoirement** une table de partition GPT en cas d’installation en mode UEFI. Si vous n’êtes pas passé par gParted, il faut utiliser l’outil cgdisk.
-Avant cela, pour savoir quel est le disque que vous devez paritionner, vous pouvez utiliser la commande `fdisk -l`. 
+Avant cela, pour savoir quel est le disque que vous devez partitionner, vous pouvez utiliser la commande `fdisk -l`. 
 
 | Référence | Point de montage |  Taille                                                                                    | Système de fichiers  |
 | --------- | ---------------- |------------------------------------------------------------------------------------------  | -------------------- |
 | /dev/sda1 | /boot/efi        | 128 Mo                                                                                     |  fat32               |
-| /dev/sda2 |                  | Taille de la mémoire vive ou plus – à partir de 8 Go de mémoire vive, 4 Go sont conseillés |  swap                |
-| /dev/sda3 | / et /home       | Le reste du disque (qui sera divisé en deux sous-volumes BTRFS)                            |  btrfs               |
+| /dev/sda2 | /boot            | 2 Go                                                                                       |  btrfs               |
+| /dev/sda3 |                  | Taille de la mémoire vive ou plus – à partir de 8 Go de mémoire vive, 4 Go sont conseillés |  swap                |
+| /dev/sda4 | / et /home       | Le reste du disque (qui sera chiffré et divisé en deux sous-volumes BTRFS)                 |  btrfs               |
   
 
-**Note :** pour la partition /boot/efi, il faut qu’elle soit étiquetée en EF00 à sa création. Pour le swap, c’est la référence 8200.
+**Note :** pour la partition /boot/efi, il faut qu’elle soit étiquetée en EF00 à sa création. Pour le swap, c’est la référence 8200 ; pour la partition boot, conserver 8300 ; pour la partition principale (chiffrée), sélectionner 8309. 
 
 ![cgdisk en action pour un partitionnement avec un UEFI](pictures/cgdisk.png)
 
@@ -73,30 +76,45 @@ Le partitionnement à appliquer ? C’est le suivant :
 
 ```
 mkfs.fat -F32 /dev/sda1
-mkfs.btrfs /dev/sda3
+mkfs.btrfs /dev/sda2
 ```
+
+Pour créer la partition chiffrée en BTRFS : 
+```
+cryptsetup -v luksFormat /dev/sda4
+cryptsetup open /dev/sda4 root
+mkfs.btrfs /dev/mapper/root
+``` 
 
 Sans oublier la partition de swap :
 
 ```
-mkswap /dev/sda2
-swapon /dev/sda2
+mkswap /dev/sda3
+swapon /dev/sda3
 ```
+
 
 Pour créer les sous-volumes BTRFS:
 
 ```
-mount /dev/sda3 /mnt
+mount /dev/mapper/root /mnt
 btrfs subvolume create /mnt/@ /mnt/@home
 umount /mnt
 ```
 
 Et pour les points de montage :
 
-```
-mount -o compress=zstd,subvol=@ /dev/sda3 /mnt
-mkdir /mnt/{boot,boot/efi,home}
-mount -o compress=zstd,subvol=@home /dev/sda3 /mnt/home
+```bash
+# Pour /
+mount -o compress=zstd,subvol=@ /dev/mapper/root /mnt
+
+# Pour /boot et /home
+mkdir /mnt/{boot,home}
+mount -o compress=zstd,subvol=@home /dev/mapper/root /mnt/home
+mount /dev/sda2 /mnt/boot
+
+# Pour /boot/efi
+mkdir /mnt/boot/efi
 mount /dev/sda1 /mnt/boot/efi
 ```
 
@@ -117,7 +135,7 @@ On passe à l’installation de la base. La deuxième ligne rajoute certains out
 
 ```
 pacstrap /mnt base linux linux-{headers,firmware} base-devel pacman-contrib man-{db,pages,pages-fr} texinfo btrfs-progs
-pacstrap /mnt zip unzip 7zip nano mc alsa-utils mtools dosfstools lsb-release exfatprogs bash-completion
+pacstrap /mnt zip unzip 7zip nano mc alsa-utils mtools dosfstools lsb-release exfatprogs bash-completion usbutils
 ```
 
 Si on veut utiliser un noyau linux long terme, il faut remplacer sur la première ligne pacstrap le paquet `linux` par `linux-lts` et `linux-headers` par `linux-lts-headers`.
@@ -200,6 +218,20 @@ hwclock --systohc --utc
 
 **Sinon, on ne touche à rien.** MS-Windows est un goujat dans ce domaine.
 
+Passons à l'étape suivante. Étant donné que nous utilisons LUKS pour le chiffrement, les paramètres de l'image noyau doivent être modifiés. Dans le fichier `/etc/mkinitcpio.conf`, modifier la ligne `HOOKS=...` pour qu'elle ressemble à ceci :
+
+```
+HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt filesystems fsck)
+```
+
+L'image noyau doit donc être régénérée ensuite :
+```bash
+mkinitcpio -p linux # ou linux-lts/hardened/zen le cas échéant
+```
+![L'image noyau est régénérée après en avoir modifié les paramètres](pictures/mkinitcpio.png)
+
+*L'image noyau est régénérée après en avoir modifié les paramètres*
+
 Au tour du chargeur de démarrage. J’utilise Grub2 qui s’occupe de tout et récupère les paquets qui vont bien. Le paquet os-prober est indispensable pour un double démarrage.
 
 
@@ -218,13 +250,30 @@ mkdir -p /boot/efi/EFI/boot
 cp /boot/efi/EFI/arch_grub/grubx64.efi /boot/efi/EFI/boot/bootx64.efi
 ```
 
-**Note :** Après avoir généré l'image noyau et installé grub, il faut passer au fichier de configuration du lanceur. C'est une modification intervenue avec grub 2:2.02-8.
+Tout comme pour l'image noyau, la configuration du bootloader doit être modifiée pour prendre en charge le chiffrement. Dans `/etc/default/grub`, ajouter les paramètres suivants à la ligne `GRUB_CMDLINE_LINUX_DEFAULT=`:
+
+```
+rd.luks.name=UUID-partition=root root=/dev/mapper/root
+```
+
+où UUID-partition doit être remplacé par l'UUID de la partition chiffrée. Par exemple :
+
+```
+rd.luks.name=78e8a9ce-4022-440c-9ece-8ff9b9309000=root root=/dev/mapper/root
+```
+
+**Note :** On peut obtenir cet UUID avec la commande `lsblk -f` (attention à sélectionner le bon):
+![L'UUID de la partition LUKS obtenu `lsblk -f`](pictures/uuid-luks.png)
+
+*L'UUID de la partition LUKS obtenu `lsblk -f`*
+
+On peut enfin générer la configuration de grub.
 
 ```
 grub-mkconfig -o /boot/grub/grub.cfg
 ```
 
-**Note 2** :Simon B m'a fait remarqué qu'en cas de double démarrage avec une autre distribution GNU/Linux déjà installée, il n'est pas indispensable d'installer de bootloader sous Archlinux. Il suffit de faire une commande comme update-grub dans la distribution installée en parallèle d'Archlinux.
+**Note 2** : Simon B m'a fait remarqué qu'en cas de double démarrage avec une autre distribution GNU/Linux déjà installée, il n'est pas indispensable d'installer de bootloader sous Archlinux. Il suffit de faire une commande comme update-grub dans la distribution installée en parallèle d'Archlinux.
 
 Bien entendu, aucune erreur ne doit apparaître. On donne un mot de passe au compte root :
 
@@ -299,7 +348,7 @@ alsactl store
 
 Nous sommes dans le multimédia ? Restons-y.
 
-On va installer l’ensemble des greffons gstreamer qui nous donneront accès aux fichiers multimédias une fois Gnome lancé. Il faudra remplacer **pacman -S** par **sudo pacman -S** quand vous utiliserez votre compte utilisateur « normal » plus tard.
+On va installer l’ensemble des greffons gstreamer qui nous donneront accès aux fichiers multimédias une fois l'environnement de bureau lancé. Il faudra remplacer **pacman -S** par **sudo pacman -S** quand vous utiliserez votre compte utilisateur « normal » plus tard.
 
 Merci à Adrien de Linuxtricks pour m’avoir aidé à réduire la longueur de la ligne de commande :)
 
@@ -332,7 +381,7 @@ Pour Nvidia, c’est un casse-tête au niveau des pilotes propriétaires. Le plu
 |                     | xf86-video-amdgpu      | AMDGPU-PRO (cf. le wiki d'Arch Linux)                |
 | Intel               | ⚠ xf86-video-intel     |                                                      |
 | Nvidia              | xf86-video-nouveau     | Nvidia (cf. le wiki d'Arch Linux) pour la version à installer en fonction de la carte graphique |
-| VMWare / VirtualBox | ⚠ xf86-video-vmware      |                                                      |
+| VMWare / VirtualBox | Aucun pilote particulier |                                                      |
 | Universel           | xf86-video-vesa        |                                                      |
 
 Si vous faites une installation dans VirtualBox, il faut deux paquets : les additions invités, et les modules noyaux nécessaires à leur fonctionnement.
@@ -371,7 +420,7 @@ Les polices noto servent, quant à elles, à supporter la majorité des caractè
 pacman -S ttf-{bitstream-vera,liberation,dejavu} gnu-free-fonts freetype2 noto-fonts{,-cjk,-emoji}
 ```
 
-**Note 5 :** pour les polices Microsoft, le paquet `ttf-ms-fonts`, elles sont sur le dépôt AUR, donc il faut utiliser un enrobeur comme yay pour les récupérer et les installer. De plus, pour la compatibilité avec les documents de versions de Microsoft Office plus récentes, vous pouvez ajouter `ttf-carlito` et `ttf-caladea` (disponibles dans les dépôts d'Arch Linux). 
+**Note :** pour les polices Microsoft, le paquet `ttf-ms-fonts`, elles sont sur le dépôt AUR, donc il faut utiliser un enrobeur comme yay pour les récupérer et les installer. De plus, pour la compatibilité avec les documents de versions de Microsoft Office plus récentes, vous pouvez ajouter `ttf-carlito` et `ttf-caladea` (disponibles dans les dépôts d'Arch Linux). 
 
 On va rajouter quelques outils, histoire de ne pas voir un environnement vide au premier démarrage.
 
@@ -413,7 +462,7 @@ Et enlever le \# sur la ligne qui suit.
 
 Pour rappel, Yay est un enrobeur de pacman, qui permet de profiter de toutes les fonctionnalités de celui-ci tout en simplifiant la gestion des loigiciels en provenance du dépôt AUR.
 
-**Note 6 : actions à effectuer en tant qu'utilisateur classique**
+**Note : actions à effectuer en tant qu'utilisateur classique**
 
 L'installation en utilisateur simple ? 
 
@@ -457,7 +506,7 @@ III) Installons l'environnement de bureau
 On commence par installer les paquets de GNOME. Gnome Logiciels (alias `gnome-software`) est désormais installé avec le méta-paquet gnome. `unoconv` sert à disposer des aperçus des documents dans GNOME Documents.
 
 ```
-sudo pacman -S gnome gnome-extra system-config-printer shotwell rhythmbox unoconv
+sudo pacman -S gnome gnome-{circle,extra} system-config-printer shotwell rhythmbox unoconv
 ```
 
 Si vous voulez ajouter le support du MTP (appareils sous Android par exemple), installez en plus le paquet `mtpfs`.
@@ -477,9 +526,9 @@ Il faut penser à vérifier que le clavier est correctement configuré. Ce qui s
 
 Pour finir une capture d’écran du mode « Gnome Shell ».
 
-![Gnome Shell 46](pictures/gnome.png)
+![Gnome Shell 49.2](pictures/gnome.png)
 
-*Gnome Shell 46*
+*Gnome Shell 49.2*
 
 #### b) Installons KDE Plasma
 
