@@ -590,15 +590,11 @@ Et pour Cinnamon :
 sudo pacman -S cinnamon cinnamon-translations gnome-{terminal,screenshot} nemo-fileroller eog xed celluloid blueman
 ```
 
-véirifier la nécessité de gnome-screenshot 
-
 Complétons l'installation de ces 3 environnements par divers logiciels types et utilitaires communs aux deux environnements :
 
 ```
 sudo pacman -S xreader galculator quodlibet python-pyinotify xarchiver shotwell lightdm-gtk-greeter system-config-printer simple-scan **→ (pour installer le support des imprimantes et des scanners)**
 ```
-
-todo : xarchiver sur cinnamon ? 
 
 Si vous voulez personnaliser votre lightdm :
 
