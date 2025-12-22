@@ -7,7 +7,7 @@ Sommaire
       * [III) Installons l'environnement de bureau.](#iii-installons-lenvironnement-de-bureau)<br>
             * [a) Installons GNOME](#a-installons-gnome)<br>
             * [b) Installons KDE Plasma](#b-installons-kde-plasma)<br>
-            * [c) Installons Xfce, Mate ou Cinnamon](#c-installons-xfce-mate-ou-cinnamon)<br>
+            * [c) Installons Xfce ou Cinnamon](#c-installons-xfce-ou-cinnamon)<br>
             * [d) Installons LXQt](#d-installons-lxqt)<br>
 
 Créé par [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
