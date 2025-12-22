@@ -49,7 +49,8 @@ On s'occupe de vérifier que la connexion Internet est fonctionnelle :
 ```
 ping -c 5 archlinux.org
 ```
-**Note :** si vous souhaitez utiliser une connexion WiFi, un serveur proxy ou SSH pour réaliser l'installation, je vous invite à lire [l'annexe didée à la configuration du réseau](annexe-reseau.md).
+**Note :** si vous souhaitez utiliser une connexion WiFi, un serveur proxy ou SSH (particulièrement utile voire recommandé pour éviter certaines recopies pénibles lors de la première partie de ce tutoriel) pour réaliser l'installation, je vous invite à lire 
+[l'annexe didée à la configuration du réseau](annexe-reseau.md).
 
 Si tout est fonctionnel, nous pouvons passer au partitionnement. Pour plus de sécurité, je vous propose désormais une installation chiffrée avec **LUKS**.
 
@@ -263,9 +264,9 @@ rd.luks.name=78e8a9ce-4022-440c-9ece-8ff9b9309000=root root=/dev/mapper/root
 ```
 
 **Note :** On peut obtenir cet UUID avec la commande `lsblk -f` (attention à sélectionner le bon):
-![L'UUID de la partition LUKS obtenu `lsblk -f`](pictures/uuid-luks.png)
+![L'UUID de la partition LUKS obtenu avec `lsblk -f`](pictures/uuid-luks.png)
 
-*L'UUID de la partition LUKS obtenu `lsblk -f`*
+*L'UUID de la partition LUKS obtenu avec `lsblk -f`*
 
 On peut enfin générer la configuration de grub.
 
@@ -430,10 +431,10 @@ On installe le service d'impression CUPS et le maximum de pilotes pour l'imprima
 pacman -S cups hplip python-pyqt5 foomatic-db{,-ppds,-gutenprint-ppds,-nonfree,-nonfree-ppds} gutenprint
 ```
 
-Nous allons maintenant installer plusieurs logiciels utiles au quotidien : Firefox pour le navigateur web (avec l'indispensable bloqueur de publicités), LibreOffice pour la suite bureautique (avec le correcteur orthographique Hunspell) et GIMP pour la retouche photo :
+Nous allons maintenant installer plusieurs logiciels utiles au quotidien : Firefox pour le navigateur web (avec l'indispensable bloqueur de publicités), Thunderbird pour la gestion des mails, LibreOffice pour la suite bureautique (avec le correcteur orthographique Hunspell) et GIMP pour la retouche photo :
 
 ```
-pacman -S firefox-{i18n-fr,ublock-origin} libreoffice-fresh-fr hunspell-{en_us,fr} gimp gimp-help-fr
+pacman -S firefox-{i18n-fr,ublock-origin} thunderbird-i18n-fr  libreoffice-fresh-fr hunspell-{en_us,fr} gimp gimp-help-fr
 ```
 De nombreux autres logiciels sont bien sûr également disponibles dans les dépôts d'ArchLinux.
 
@@ -535,14 +536,14 @@ Pour finir une capture d’écran du mode « Gnome Shell ».
 
 **Note :** commandes à entrer en tant qu’utilisateur classique. Vous pouvez utiliser un enrobeur de pacman comme yay par exemple.
 
-Pour utiliser Discover avec les dépôts d'Arch Linux, `packagekit-qt5` est indispensable. La `libappindicator-gtk{2,3}` permet de mieux supporter les notifications des applications GTK+. Pensez à sélectionner le paquet `tesseract-data-fra` (pour l'OCR en langue française, utilisé par l'application `skanpage`) si un tel choix vous est proposé.
+La `libappindicator` permet de mieux supporter les notifications des applications GTK+. Pensez à sélectionner le paquet `tesseract-data-fra` (pour l'OCR en langue française, utilisé par l'application `skanpage`) si un tel choix vous est proposé.
 
-**Note** : si vous ne voulez pas installer toutes les applications du groupe `kde-applications`, sachez qu'il existe également des plus petits groupes regroupant les applications KDE par catégories : `kde-accessibility`, `kde-multimedia`... 
+**Note** : si vous ne voulez pas installer toutes les applications du groupe `kde-applications`, sachez qu'il existe également des plus petits groupes regroupant les applications KDE par catégories : `kde-accessibility`, `kde-multimedia`... Vous pouvez en trouver la liste [ici](https://archlinux.org/groups/). 
 
 L’installation se déroule ainsi :
 
 ```
-sudo pacman -S plasma kde-applications digikam packagekit-qt5 libappindicator-gtk{2,3}
+sudo pacman -S plasma kde-applications digikam libappindicator
 ```
 
 On lance ensuite sddm :
@@ -557,15 +558,15 @@ Si tout se passe bien, on peut utiliser pour l'activer:
 sudo systemctl enable sddm
 ```
 
-En cas de soucis d'affichage, notamment sur VirtualBox, tentez de vous connecter sur une session X11 au lieu de Wayland (désormais choix par défaut). 
-
 ![Illustration 14: Plasma 6.1.4](pictures/plasma.png)
 
 *Illustration 14: Plasma 6.1.4*
 
-#### c) Installons Xfce, Mate ou Cinnamon 
+#### c) Installons Xfce ou Cinnamon 
 
-Par souci de simplicité, j'ai décidé de regrouper dans un même pargraphe ces 3 environnements dont le processus d'installation est assez proche.
+Par souci de simplicité, j'ai décidé de regrouper dans un même pargraphe ces 2 environnements dont le processus d'installation est assez proche.
+
+**Note :** Le développement de Mate semblant fortement ralenti ces derniers temps, j'ai choisi de me concentrer sur Xfce qui y ressemble aujourd'hui et est plus activement développé.
 
 **Note :** commandes à entrer en tant qu’utilisateur classique. Vous pouvez utiliser un enrobeur de pacman comme yay par exemple.
 
@@ -575,25 +576,29 @@ Si vous voulez la totalité des greffons gvfs (merci à SuperMarioS pour la lign
 sudo pacman -S gvfs-{afc,dnssd,goa,google,gphoto2,mtp,nfs,onedrive,smb,wsdd}
 ```
 
-La première ligne ici est propre à l'environnement que vous voulez installer. Comme vous pouvez le remarquer, l'installation de ces 3 environnements est complétée par divers logiciels types, comme quodlibet (et sa dépendance python-pyniotify) pour la musique ou claws-mail comme client mail.
+La première ligne ici est propre à l'environnement que vous voulez installer. 
 
 Pour installer Xfce, il faut entrer :
 
 ```
-sudo pacman -S xfce4 xfce4-goodies gvfs quodlibet python-pyinotify lightdm-gtk-greeter xarchiver claws-mail galculator atril ffmpegthumbnailer pavucontrol pulseaudio-{alsa,bluetooth} network-manager-applet system-config-printer simple-scan **→ (pour installer le support des imprimantes et des scanners)**
+sudo pacman -S xfce4 xfce4-goodies gvfs xarchiver ffmpegthumbnailer pavucontrol pulseaudio-{alsa,bluetooth} network-manager-applet
 ```
 
-Pour Mate :
+Et pour Cinnamon :
 
 ```
-sudo pacman -S mate mate-extra lightdm-gtk-greeter celluloid quodlibet python-pyinotify claws-mail ffmpegthumbnailer pulseaudio-{alsa,bluetooth} blueman network-manager-applet system-config-printer simple-scan
+sudo pacman -S cinnamon cinnamon-translations gnome-{terminal,screenshot} nemo-fileroller eog xed celluloid blueman
 ```
 
-Enfin, pour Cinnamon :
+véirifier la nécessité de gnome-screenshot 
+
+Complétons l'installation de ces 3 environnements par divers logiciels types et utilitaires communs aux deux environnements :
 
 ```
-sudo pacman -S cinnamon cinnamon-translations gnome-{screenshot,calculator,extra} xreader lightdm-gtk-greeter shotwell rhythmbox celluloid blueman system-config-printer simple-scan
+sudo pacman -S xreader galculator quodlibet python-pyinotify xarchiver shotwell lightdm-gtk-greeter system-config-printer simple-scan **→ (pour installer le support des imprimantes et des scanners)**
 ```
+
+todo : xarchiver sur cinnamon ? 
 
 Si vous voulez personnaliser votre lightdm :
 
@@ -604,28 +609,22 @@ sudo pacman -S lightdm-gtk-greeter-settings
 Pour lancer l'environnement, il faut entrer dans un premier temps :
 
 ```
-sudo systemctl start accounts-daemon --> *uniquement si vous utilisez Mate*
 sudo systemctl start lightdm
 ```
 
 Et si tout se passe bien, on peut utiliser :
 
 ```
-sudo systemctl enable accounts-daemon --> *uniquement si vous utilisez Mate*
 sudo systemctl enable lightdm
 ```
 
-![Xfce 4.18 en action.](pictures/xfce.png)
+![Xfce 4.20 en action.](pictures/xfce.png)
 
-*Xfce 4.18 en action.*
+*Xfce 4.20 en action.*
 
-![Mate Desktop 1.28.2](pictures/mate.png)
+![Cinnamon 6.6.2](pictures/cinnamon.png)
 
-*Mate Desktop 1.28.2*
-
-![Cinnamon 6.2.9](pictures/cinnamon.png)
-
-*Cinnamon 6.2.9, légèrement personnalisé*
+*Cinnamon 6.6.2*
 
 #### d) Installons LXQt
 
@@ -639,13 +638,13 @@ Dans cette nouvelle version du tutoriel, j'ai décidé de ne garder que l'enviro
 yay gvfs-{afc,dnssd,goa,google,gphoto2,mtp,nfs,onedrive,smb,wsdd}
 ```
 
-Comme pour l’installation de Xfce ou encore de Mate Desktop, j’ai pris quelques logiciels types. Libre à vous de remplacer Claws-mail par Mozilla Thunderbird par exemple.
+Comme pour l’installation de Xfce ou encore de Cinnamon, j’ai pris quelques logiciels types. Libre à vous de remplacer VLC par Mozilla SMplayer par exemple.
 
 Xterm est installé, car il est indispensable pour faire fonctionner l’appliquette de gestion du niveau du son.
 
 Pour installer LXQt :
 ```
-yay -S lxqt breeze-icons sddm vlc qmmp xscreensaver libstatgrab lm_sensors claws-mail pulseaudio-alsa featherpad qpdfview nm-tray system-config-printer skanlite **→ (pour installer le support des imprimantes et des scanners)**
+yay -S lxqt breeze-icons sddm vlc qmmp xscreensaver libstatgrab lm_sensors pulseaudio-alsa featherpad qpdfview nm-tray system-config-printer skanlite **→ (pour installer le support des imprimantes et des scanners)**
 ```
 
 Pour lancer LXQt, il faut entrer dans un premier temps :
