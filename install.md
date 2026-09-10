@@ -1,7 +1,7 @@
 Sommaire
 ========
 
-   * [Petit guide d’installation d’Archlinux avec Gnome / Plasma / Xfce / Mate-Desktop / Cinnamon / LXQt](#petit-guide-dinstallation-darchlinux-avec-gnome--plasma--xfce--mate-desktop--cinnamon--lxqt)
+   * [Petit guide d’installation d’Archlinux avec Gnome / Plasma / Xfce / Cinnamon / LXQt](#petit-guide-dinstallation-darchlinux-avec-gnome--plasma--xfce--mate-desktop--cinnamon--lxqt)
       * [I) Installons notre base](#i-installons-notre-base)<br>
       * [II) Commençons l'installation de l’environnement graphique !](#ii-commen%C3%A7ons-linstallation-de-lenvironnement-graphique-)
       * [III) Installons l'environnement de bureau.](#iii-installons-lenvironnement-de-bureau)<br>
@@ -16,7 +16,7 @@ Créé par [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 Petit guide d’installation d’Archlinux avec GNOME / Plasma / Xfce / Mate-Desktop / Cinnamon / LXQt
 =======================================================================================================================
 
-Dans ce petit guide, je vais détailler l’installation d’Archlinux avec GNOME, Plasma, Xfce,  Mate-Desktop, Cinnamon et LXQt. L’installation terminée proposera un environnement suffisamment étoffé pour être utilisable.
+Dans ce petit guide, je vais détailler l’installation d’Archlinux avec GNOME, Plasma, Xfce, Cinnamon et LXQt. L’installation terminée proposera un environnement suffisamment étoffé pour être utilisable.
 
 Pour des raisons pratiques, je n’aborde nullement l’ajout de matériel comme les imprimantes, les scanners, ou encore les webcams. Je vous renvoie aux wikis anglophone <https://wiki.archlinux.org/> et francophone <http://wiki.archlinux.fr/Accueil> pour ce genre de manipulations.
 
@@ -24,10 +24,12 @@ Pour des raisons pratiques, je n’aborde nullement l’ajout de matériel comme
 
 Merci à Ewolnux, Xarkam, Frédéric Sierra, Ludovic Riand, Vincent Manillier, Thomas Pawlowski, Igor Milhit, André Ray, Nicolas, Charles Monzat, SuperMario S, Angristan, Simon B, r33int, Mozzi, Kevin Dubrulle, Christophe Leloup, Nornort et Quentin Bihet pour leurs conseils et remarques. Et merci surtout à Frédéric Béziès pour avoir rédigé les premières versions de ce document, proposé sous licence [CC-BY-SA 4.0.](http://creativecommons.org/licenses/by-sa/4.0)
 
+Mes remerciements pour Chennux sur le boulot effectué qui est tout simplement énorme !
+
 I) Installons notre base
 ------------------------
 
-Installer une Archlinux, c’est comme construire une maison. On commence par les fondations, et on rajoute les murs et le reste par la suite. L’image ISO utilisée est la archlinux-2025.12.01-x86_64.iso, mise en ligne début décembre 2025.
+Installer une Archlinux, c’est comme construire une maison. On commence par les fondations, et on rajoute les murs et le reste par la suite. L’image ISO utilisée est la archlinux-2026.09.01-x86_64.iso, mise en ligne début septembre 2026.
 
 La machine virtuelle est une machine virtuelle à laquelle j’ai rajouté un disque virtuel de 50 Go. Des points spécifiques concernant l’utilisation dans VirtualBox et VMWare sont indiqués.
 
@@ -52,7 +54,7 @@ ping -c 5 archlinux.org
 **Note :** si vous souhaitez utiliser une connexion WiFi, un serveur proxy ou SSH (particulièrement utile voire recommandé pour éviter certaines recopies pénibles lors de la première partie de ce tutoriel) pour réaliser l'installation, je vous invite à lire 
 [l'annexe didée à la configuration du réseau](annexe-reseau.md).
 
-Si tout est fonctionnel, nous pouvons passer au partitionnement. Pour plus de sécurité, je vous propose désormais une installation chiffrée avec **LUKS**.
+Si tout est fonctionnel, nous pouvons passer au partitionnement. Pour plus de sécurité, je vous propose désormais une installation chiffrée avec **LUKS**. Ce n'est pas obligatoire de chiffrer l'ensemble et vous pouvez ignorer les passages correspondants sans danger.
 
 Pour le partitionnement, si vous avez peur de faire des bêtises, il est plus prudent de passer par un LiveCD comme gParted disponible à l’adresse suivante : <http://gparted.org/download.php>
 
@@ -260,7 +262,7 @@ rd.luks.name=UUID-partition=root root=/dev/mapper/root
 où UUID-partition doit être remplacé par l'UUID de la partition chiffrée. Par exemple :
 
 ```
-rd.luks.name=78e8a9ce-4022-440c-9ece-8ff9b9309000=root root=/dev/mapper/root
+rd.luks.name=add9a6fd-4619-4fa3-9e9f-87124e345a81=root root=/dev/mapper/root
 ```
 
 **Note :** On peut obtenir cet UUID avec la commande `lsblk -f` (attention à sélectionner le bon):
@@ -416,6 +418,7 @@ systemctl enable --now {vmtoolsd,vmware-vmblock-fuse}.service
 **Note** : pour installer VMWare sur une machine réelle cette page du wiki anglophone est très utile : <https://wiki.archlinux.org/index.php/VMware>
 
 On passe ensuite à l’installation des polices. Voici la ligne de commande pour les principales. Le paquet freetype2 apportant quelques améliorations. Merci à Angristan pour la suggestion.
+
 Les polices noto servent, quant à elles, à supporter la majorité des caractères Unicode (émojis, caractères asiatiques, symoboles mathématiques...).
 ```
 pacman -S ttf-{bitstream-vera,liberation,dejavu} gnu-free-fonts freetype2 noto-fonts{,-cjk,-emoji}
@@ -504,11 +507,12 @@ III) Installons l'environnement de bureau
 
 **Note :** commandes à entrer en tant qu’utilisateur classique. Vous pouvez utiliser un enrobeur de pacman comme `yay` par exemple.
 
-On commence par installer les paquets de GNOME. Gnome Logiciels (alias `gnome-software`) est désormais installé avec le méta-paquet gnome. `unoconv` sert à disposer des aperçus des documents dans GNOME Documents.
+On commence par installer les paquets de GNOME. Gnome Logiciels (alias `gnome-software`) est désormais installé avec le méta-paquet gnome.
 
 ```
-sudo pacman -S gnome gnome-{circle,extra} system-config-printer shotwell rhythmbox unoconv
+sudo pacman -S gnome gnome-{circle,extra} system-config-printer shotwell rhythmbox 
 ```
+Lorsqu'on demande le fournisseur pour `tesseract`, il faut entrer 40 pour avoir le dictionnaire en français.
 
 Si vous voulez ajouter le support du MTP (appareils sous Android par exemple), installez en plus le paquet `mtpfs`.
 L’installation de Gnome est maintenant terminée.
@@ -527,16 +531,16 @@ Il faut penser à vérifier que le clavier est correctement configuré. Ce qui s
 
 Pour finir une capture d’écran du mode « Gnome Shell ».
 
-![Gnome Shell 49.2](pictures/gnome.png)
+![Gnome Shell 50.4](pictures/gnome.png)
 
-*Gnome Shell 49.2*
+*Gnome Shell 50.4*
 
 #### b) Installons KDE Plasma
 
 
 **Note :** commandes à entrer en tant qu’utilisateur classique. Vous pouvez utiliser un enrobeur de pacman comme yay par exemple.
 
-La `libappindicator` permet de mieux supporter les notifications des applications GTK+. Pensez à sélectionner le paquet `tesseract-data-fra` (pour l'OCR en langue française, utilisé par l'application `skanpage`) si un tel choix vous est proposé.
+La `libappindicator` permet de mieux supporter les notifications des applications GTK+. Pensez à sélectionner le paquet `tesseract-data-fra` (pour l'OCR en langue française, utilisé par l'application `skanpage`) si un tel choix vous est proposé, c'est la valeur 40.
 
 **Note** : si vous ne voulez pas installer toutes les applications du groupe `kde-applications`, sachez qu'il existe également des plus petits groupes regroupant les applications KDE par catégories : `kde-accessibility`, `kde-multimedia`... Vous pouvez en trouver la liste [ici](https://archlinux.org/groups/). 
 
@@ -549,18 +553,18 @@ sudo pacman -S plasma kde-applications digikam libappindicator
 On lance ensuite sddm :
 
 ```
-sudo systemctl start sddm
+sudo systemctl start plasmalogin
 ```
 
 Si tout se passe bien, on peut utiliser pour l'activer:
 
 ```
-sudo systemctl enable sddm
+sudo systemctl enable plasmalogin
 ```
 
-![Illustration 14: Plasma 6.1.4](pictures/plasma.png)
+![Plasma 7.6.5](pictures/plasma.png)
 
-*Illustration 14: Plasma 6.1.4*
+*Plasma 6.75*
 
 #### c) Installons Xfce ou Cinnamon 
 
@@ -573,7 +577,7 @@ Par souci de simplicité, j'ai décidé de regrouper dans un même pargraphe ces
 **Note 2 :** si vous avez besoin de gérer des périphériques utilisant MTP (tablettes sous android par exemple), il vous faut rajouter les deux paquets `gvfs-mtp` et `mtpfs`.
 Si vous voulez la totalité des greffons gvfs (merci à SuperMarioS pour la ligne de commande) :
 ```
-sudo pacman -S gvfs-{afc,dnssd,goa,google,gphoto2,mtp,nfs,onedrive,smb,wsdd}
+sudo pacman -S gvfs-{afc,dnssd,goa,gphoto2,mtp,nfs,onedrive,smb,wsdd}
 ```
 
 La première ligne ici est propre à l'environnement que vous voulez installer. 
@@ -618,9 +622,9 @@ sudo systemctl enable lightdm
 
 *Xfce 4.20 en action.*
 
-![Cinnamon 6.6.2](pictures/cinnamon.png)
+![Cinnamon 6.6.9](pictures/cinnamon.png)
 
-*Cinnamon 6.6.2*
+*Cinnamon 6.6.9*
 
 #### d) Installons LXQt
 
@@ -631,7 +635,7 @@ Dans cette nouvelle version du tutoriel, j'ai décidé de ne garder que l'enviro
 **Note 2** : Si vous avez besoin de gérer des périphériques utilisant MTP (tablettes sous android par exemple), il vous faut rajouter les deux paquets `gvfs-mtp` et `mtpfs`. Si vous voulez la totalité des greffons gvfs (merci à SuperMarioS pour la ligne de commande) :
 
 ```
-yay gvfs-{afc,dnssd,goa,google,gphoto2,mtp,nfs,onedrive,smb,wsdd}
+yay gvfs-{afc,dnssd,goa,gphoto2,mtp,nfs,onedrive,smb,wsdd}
 ```
 
 Comme pour l’installation de Xfce ou encore de Cinnamon, j’ai pris quelques logiciels types. Libre à vous de remplacer VLC par Mozilla SMplayer par exemple.
@@ -640,7 +644,7 @@ Xterm est installé, car il est indispensable pour faire fonctionner l’appliqu
 
 Pour installer LXQt :
 ```
-yay -S lxqt breeze-icons sddm vlc qmmp xscreensaver libstatgrab lm_sensors pulseaudio-alsa featherpad qpdfview nm-tray system-config-printer skanlite **→ (pour installer le support des imprimantes et des scanners)**
+yay -S lxqt breeze-icons sddm vlc qmmp xscreensaver libstatgrab lm_sensors pulseaudio-alsa featherpad okular system-config-printer skanlite **→ (pour installer le support des imprimantes et des scanners)**
 ```
 
 Pour lancer LXQt, il faut entrer dans un premier temps :
@@ -655,9 +659,9 @@ Si tout se passe bien, on peut utiliser :
 sudo systemctl enable sddm
 ```
 
-![LXQt 2.0.0](pictures/lxqt.png)
+![LXQt 2.4.0](pictures/lxqt.png)
 
-*LXQt 2.0.0*
+*LXQt 2.4.0*
 
 Voila, le guide est maintenant fini. Cependant, je n’ai pas abordé l’installation d’un pare-feu. C’est quelque chose de plus technique.
 
