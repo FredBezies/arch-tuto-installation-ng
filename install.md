@@ -13,7 +13,7 @@ Sommaire
 Créé par [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
 
-Petit guide d’installation d’Archlinux avec GNOME / Plasma / Xfce / Mate-Desktop / Cinnamon / LXQt
+Petit guide d’installation d’Archlinux avec GNOME / Plasma / Xfce / Cinnamon / LXQt
 =======================================================================================================================
 
 Dans ce petit guide, je vais détailler l’installation d’Archlinux avec GNOME, Plasma, Xfce, Cinnamon et LXQt. L’installation terminée proposera un environnement suffisamment étoffé pour être utilisable.
