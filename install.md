@@ -137,7 +137,7 @@ Autrement dit, nous allons utiliser uniquement des miroirs français et britanni
 On passe à l’installation de la base. La deuxième ligne rajoute certains outils bien pratiques à avoir dès le départ. On peut ensuite s’attaquer à l’installation proprement dite.
 
 ```
-pacstrap /mnt base linux linux-{headers,firmware} base-devel pacman-contrib man-{db,pages,pages-fr} texinfo btrfs-progs
+pacstrap /mnt base linux linux-{headers,firmware} base-devel pacman-contrib man-{db,pages,pages-fr} texinfo btrfs-progs systemd-sysvcompat
 pacstrap /mnt zip unzip 7zip nano mc alsa-utils mtools dosfstools lsb-release exfatprogs bash-completion usbutils
 ```
 
@@ -353,7 +353,7 @@ Nous sommes dans le multimédia ? Restons-y.
 
 On va installer l’ensemble des greffons gstreamer qui nous donneront accès aux fichiers multimédias une fois l'environnement de bureau lancé. Il faudra remplacer **pacman -S** par **sudo pacman -S** quand vous utiliserez votre compte utilisateur « normal » plus tard.
 
-Merci à Adrien de Linuxtricks pour m’avoir aidé à réduire la longueur de la ligne de commande :)
+Merci à Adrien Linuxtricks pour m’avoir aidé à réduire la longueur de la ligne de commande :)
 
 ```
 pacman -S gst-plugins-{base,good,bad,ugly} gst-libav
@@ -510,7 +510,7 @@ III) Installons l'environnement de bureau
 On commence par installer les paquets de GNOME. Gnome Logiciels (alias `gnome-software`) est désormais installé avec le méta-paquet gnome.
 
 ```
-sudo pacman -S gnome gnome-{circle,extra} system-config-printer shotwell rhythmbox 
+sudo pacman -S gnome gnome-{circle,extra} system-config-printer shotwell rhythmbox pipewire-{alsa,bluetooth}
 ```
 Lorsqu'on demande le fournisseur pour `tesseract`, il faut entrer 40 pour avoir le dictionnaire en français.
 
@@ -531,9 +531,9 @@ Il faut penser à vérifier que le clavier est correctement configuré. Ce qui s
 
 Pour finir une capture d’écran du mode « Gnome Shell ».
 
-![Gnome Shell 50.4](pictures/gnome.png)
+![Gnome Shell 50.5](pictures/gnome.png)
 
-*Gnome Shell 50.4*
+*Gnome Shell 50.5*
 
 #### b) Installons KDE Plasma
 
@@ -550,7 +550,7 @@ L’installation se déroule ainsi :
 sudo pacman -S plasma kde-applications digikam libappindicator
 ```
 
-On lance ensuite sddm :
+On lance ensuite Plasma Login Manager :
 
 ```
 sudo systemctl start plasmalogin
@@ -564,7 +564,7 @@ sudo systemctl enable plasmalogin
 
 ![Plasma 7.6.5](pictures/plasma.png)
 
-*Plasma 6.75*
+*Plasma 6.7.5*
 
 #### c) Installons Xfce ou Cinnamon 
 
@@ -638,7 +638,7 @@ Dans cette nouvelle version du tutoriel, j'ai décidé de ne garder que l'enviro
 yay gvfs-{afc,dnssd,goa,gphoto2,mtp,nfs,onedrive,smb,wsdd}
 ```
 
-Comme pour l’installation de Xfce ou encore de Cinnamon, j’ai pris quelques logiciels types. Libre à vous de remplacer VLC par Mozilla SMplayer par exemple.
+Comme pour l’installation de Xfce ou encore de Cinnamon, j’ai pris quelques logiciels types. Libre à vous de remplacer VLC par SMplayer par exemple.
 
 Xterm est installé, car il est indispensable pour faire fonctionner l’appliquette de gestion du niveau du son.
 
