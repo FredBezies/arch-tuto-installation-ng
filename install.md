@@ -205,7 +205,7 @@ On peut spécifier la locale pour la session courante, à modifier en fonction d
 export LANG=fr_FR.UTF-8
 ```
 
-Le nom de la machine ? Il est contenu dans le fichier **/etc/hostname**. Il suffit de taper le nom sur la première ligne. Par exemple : *chen-archlinux.* À remplacer par le nom de la machine bien entendu.
+Le nom de la machine ? Il est contenu dans le fichier **/etc/hostname**. Il suffit de taper le nom sur la première ligne. Par exemple : *fredo-arch.* À remplacer par le nom de la machine bien entendu.
 
 Le fuseau horaire ? Une seule étape. Prenons le cas d’une installation avec le fuseau horaire de Paris. Tout dépend de votre lieu de résidence. On commence par créer un lien symbolique :
 
@@ -531,9 +531,9 @@ Il faut penser à vérifier que le clavier est correctement configuré. Ce qui s
 
 Pour finir une capture d’écran du mode « Gnome Shell ».
 
-![Gnome Shell 50.5](pictures/gnome.png)
+![Gnome Shell 51.1](pictures/gnome.png)
 
-*Gnome Shell 50.5*
+*Gnome Shell 51.1*
 
 #### b) Installons KDE Plasma
 
@@ -562,9 +562,9 @@ Si tout se passe bien, on peut utiliser pour l'activer:
 sudo systemctl enable plasmalogin
 ```
 
-![Plasma 7.6.5](pictures/plasma.png)
+![Plasma 6.8.2](pictures/plasma.png)
 
-*Plasma 6.7.5*
+*Plasma 6.8.2*
 
 #### c) Installons Xfce ou Cinnamon 
 
@@ -585,13 +585,13 @@ La première ligne ici est propre à l'environnement que vous voulez installer.
 Pour installer Xfce, il faut entrer :
 
 ```
-sudo pacman -S xfce4 xfce4-goodies gvfs xarchiver ffmpegthumbnailer pavucontrol pulseaudio-{alsa,bluetooth} network-manager-applet
+sudo pacman -S xfce4{,-goodies} gvfs xarchiver ffmpegthumbnailer pavucontrol pulseaudio-{alsa,bluetooth} network-manager-applet
 ```
 
 Et pour Cinnamon :
 
 ```
-sudo pacman -S cinnamon cinnamon-translations gnome-{terminal,screenshot} nemo-fileroller eog xed celluloid blueman
+sudo pacman -S cinnamon{,-translations} gnome-{terminal,screenshot} nemo-fileroller eog xed celluloid blueman
 ```
 
 Complétons l'installation de ces 2 environnements par divers logiciels types et utilitaires communs aux deux environnements :
@@ -635,7 +635,7 @@ Dans cette nouvelle version du tutoriel, j'ai décidé de ne garder que l'enviro
 **Note 2** : Si vous avez besoin de gérer des périphériques utilisant MTP (tablettes sous android par exemple), il vous faut rajouter les deux paquets `gvfs-mtp` et `mtpfs`. Si vous voulez la totalité des greffons gvfs (merci à SuperMarioS pour la ligne de commande) :
 
 ```
-yay gvfs-{afc,dnssd,goa,gphoto2,mtp,nfs,onedrive,smb,wsdd}
+sudo pacman -S gvfs-{afc,dnssd,goa,gphoto2,mtp,nfs,onedrive,smb,wsdd}
 ```
 
 Comme pour l’installation de Xfce ou encore de Cinnamon, j’ai pris quelques logiciels types. Libre à vous de remplacer VLC par SMplayer par exemple.
@@ -644,7 +644,7 @@ Xterm est installé, car il est indispensable pour faire fonctionner l’appliqu
 
 Pour installer LXQt :
 ```
-yay -S lxqt breeze-icons sddm vlc qmmp xscreensaver libstatgrab lm_sensors pulseaudio-alsa featherpad okular system-config-printer skanlite **→ (pour installer le support des imprimantes et des scanners)**
+sudo pacman -S lxqt breeze-icons sddm vlc qmmp xscreensaver libstatgrab lm_sensors featherpad okular system-config-printer skanlite **→ (pour installer le support des imprimantes et des scanners)**
 ```
 
 Pour lancer LXQt, il faut entrer dans un premier temps :
